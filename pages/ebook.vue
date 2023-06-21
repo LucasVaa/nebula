@@ -1,5 +1,8 @@
 <template>
   <div class="ebook">
+    <div class="title">
+      {{ bookMeta.title }} &nbsp-&nbsp {{ bookMeta.creator }}
+    </div>
     <div class="read-wrapper">
       <div id="read" class="read"></div>
       <div class="mask">
@@ -91,6 +94,10 @@ export default {
       // 图书是否是可用状态
       bookAvailable: false,
       navigation: {},
+      bookMeta: {
+        title: "",
+        creator: "",
+      },
     };
   },
   methods: {
@@ -170,6 +177,7 @@ export default {
     },
     // 电子书的解析和渲染
     showEpub() {
+      let self = this;
       // 生成 Ebook
       this.book = new Epub(DOWNLOAD_URL);
       // 生成 Rendtion
@@ -181,6 +189,12 @@ export default {
       this.rendition.display();
       // 获取 Theme 对象
       this.themes = this.rendition.themes;
+      console.log(this.book.loaded.metadata);
+      // 获取元数据
+      this.book.loaded.metadata.then(function (result) {
+        self.bookMeta.title = result.title;
+        self.bookMeta.creator = result.creator;
+      });
       // 设置默认字体
       this.setFontSize(this.defaultFontSize);
       // this.themes.register(name, styles)
@@ -208,6 +222,16 @@ export default {
 </script>
 
 <style>
+.title {
+  height: 40px;
+  color: #a6a6a6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.title:hover {
+  color: #535353;
+}
 .ebook {
   position: relative;
 }
@@ -217,7 +241,7 @@ export default {
 }
 .mask {
   position: absolute;
-  top: 0;
+  top: 5%;
   left: 0;
   z-index: 100;
   display: flex;
