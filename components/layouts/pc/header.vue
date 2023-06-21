@@ -133,6 +133,7 @@
           </el-popover>
           <el-link :underline="false" @click="login" rel="nofollow" style="margin-left: 10px;">登录</el-link>
           <el-link :underline="false" href="/register" rel="nofollow" style="margin-left: 10px;">注册</el-link>
+          <el-link :underline="false" href="/ebook" rel="nofollow" style="margin-left: 10px;">阅读</el-link>
         </el-col>
       </client-only>
     </el-col>
