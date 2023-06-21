@@ -11,7 +11,7 @@
         <div class="right" @click="nextPage"></div>
       </div>
     </div>
-    <menu-bar
+    <!-- <menu-bar
       :ifTitleAndMenuShow="ifTitleAndMenuShow"
       :fontSizeList="fontSizeList"
       :defaultFontSize="defaultFontSize"
@@ -24,15 +24,15 @@
       :navigation="navigation"
       @jumpTo="jumpTo"
       ref="menuBar"
-    ></menu-bar>
+    ></menu-bar> -->
   </div>
 </template>
 
 <script>
 import MenuBar from "../components/ebook/MenuBar.vue";
 import Epub from "epubjs";
-const DOWNLOAD_URL =
-  "http://110.42.197.57:8080/epub/穿越寒冬：创业者的融资策略与独角兽思维.epub";
+// const DOWNLOAD_URL =
+//   "http://110.42.197.57:8080/epub/穿越寒冬：创业者的融资策略与独角兽思维.epub";
 export default {
   layout: "read",
   name: "Ebook",
@@ -179,7 +179,7 @@ export default {
     showEpub() {
       let self = this;
       // 生成 Ebook
-      this.book = new Epub(DOWNLOAD_URL);
+      this.book = new Epub(this.$route.query.bookUrl);
       // 生成 Rendtion
       this.rendition = this.book.renderTo("read", {
         width: window.innerWidth * 0.8,
@@ -189,7 +189,6 @@ export default {
       this.rendition.display();
       // 获取 Theme 对象
       this.themes = this.rendition.themes;
-      console.log(this.book.loaded.metadata);
       // 获取元数据
       this.book.loaded.metadata.then(function (result) {
         self.bookMeta.title = result.title;
@@ -213,6 +212,8 @@ export default {
           this.bookAvailable = true;
         });
       // console.log(this.book.locations);
+      // 获取上一次阅读位置
+      this.rendition.display("epubcfi(/6/10!/4/2/2/1:0)");
     },
   },
   mounted() {
@@ -223,7 +224,6 @@ export default {
 
 <style>
 .title {
-  height: 40px;
   color: #a6a6a6;
   display: flex;
   justify-content: center;
