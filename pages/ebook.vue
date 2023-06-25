@@ -1,17 +1,26 @@
 <template>
   <div class="ebook">
-    <div class="title">
-      {{ bookMeta.title }} &nbsp-&nbsp {{ bookMeta.creator }}
-    </div>
-    <div class="read-wrapper">
-      <div id="read" class="read"></div>
+    <el-row>
+      <el-col :span="24"
+        ><div class="title">
+          {{ bookMeta.title }} &nbsp-&nbsp {{ bookMeta.creator }}
+        </div></el-col
+      >
+    </el-row>
+    <el-row class="read-wrapper">
+      <el-col :span="2"><div class="left" @click="prevPage"></div></el-col>
+      <el-col :span="20"><div id="read" class="read"></div></el-col>
+      <el-col :span="2"><div class="right" @click="nextPage"></div></el-col>
+    </el-row>
+    <!-- <div class="read-wrapper">
       <div class="mask">
-        <div class="left" @click="prevPage"></div>
         <div class="center" @click="toggleTitleAndMenu"></div>
-        <div class="right" @click="nextPage"></div>
+      </div>
+      <div id="extras">
+        <ul id="highlights"></ul>
       </div>
     </div>
-    <!-- <menu-bar
+    <menu-bar
       :ifTitleAndMenuShow="ifTitleAndMenuShow"
       :fontSizeList="fontSizeList"
       :defaultFontSize="defaultFontSize"
@@ -214,6 +223,67 @@ export default {
       // console.log(this.book.locations);
       // 获取上一次阅读位置
       this.rendition.display("epubcfi(/6/10!/4/2/2/1:0)");
+      // 测试高亮
+      // Illustration of how to get text from a saved cfiRange
+      self.rendition.on("selected", function (cfiRange, contents) {
+        self.rendition.annotations.highlight(cfiRange, {}, (e) => {
+          console.log("highlight clicked", e.target);
+        });
+        contents.window.getSelection().removeAllRanges();
+      });
+
+      this.rendition.themes.default({
+        "::selection": {
+          background: "rgba(255,255,0, 0.3)",
+        },
+        ".epubjs-hl": {
+          fill: "yellow",
+          "fill-opacity": "0.3",
+          "mix-blend-mode": "multiply",
+        },
+      });
+      // 测试适用高亮
+      self.rendition.annotations.highlight(
+        "epubcfi(/6/10!/4/4,/1:18,/1:31)",
+        {},
+        (e) => {
+          console.log("highlight clicked", e.target);
+        }
+      );
+      // Illustration of how to get text from a saved cfiRange
+      var highlights = document.getElementById("highlights");
+
+      self.rendition.on("selected", function (cfiRange) {
+        self.book.getRange(cfiRange).then(function (range) {
+          var text;
+          var li = document.createElement("li");
+          var a = document.createElement("a");
+          var remove = document.createElement("a");
+          var textNode;
+
+          if (range) {
+            text = range.toString();
+            textNode = document.createTextNode(text);
+
+            a.textContent = cfiRange;
+            a.href = "#" + cfiRange;
+            a.onclick = function () {
+              rendition.display(cfiRange);
+            };
+
+            remove.textContent = "remove";
+            remove.href = "#" + cfiRange;
+            remove.onclick = function () {
+              rendition.annotations.remove(cfiRange);
+              return false;
+            };
+            li.appendChild(a);
+            li.appendChild(textNode);
+            li.appendChild(remove);
+            highlights.appendChild(li);
+          }
+        });
+      });
     },
   },
   mounted() {
@@ -228,6 +298,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 36px;
 }
 .title:hover {
   color: #535353;
@@ -235,9 +306,15 @@ export default {
 .ebook {
   position: relative;
 }
+.read-wrapper {
+  /* position: absolute; */
+  /* top: 5%; */
+  left: 0;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
 .read-wrapper .read {
-  width: 80%;
-  margin: 0 auto;
 }
 .mask {
   position: absolute;
@@ -248,27 +325,41 @@ export default {
   width: 100%;
   height: 100%;
 }
-.mask .left {
+.read-wrapper .left {
   height: 100%;
-  width: 8%;
-  flex: 0 0 px2rem(100);
+  width: 50%;
+  float: left;
   background: no-repeat center/100% url("~/assets/arrow_left.png");
 }
-.mask .left:hover {
+.read-wrapper .left:hover {
   background-image: url("~/assets/arrow_left_hover.png");
 }
-.mask .center {
+.read-wrapper .center {
   height: 100%;
   flex: 1;
 }
-.mask .right {
+.read-wrapper .right {
   height: 100%;
-  width: 8%;
-  flex: 0 0 px2rem(100);
+  width: 50%;
+  float: right;
   background: no-repeat center/100% url("~/assets/arrow_right.png");
 }
-.mask .right:hover {
+.read-wrapper .right:hover {
   background-image: url("~/assets/arrow_right_hover.png");
+}
+
+.el-row {
+  /* margin-bottom: 20px; */
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+.el-col {
+  border-radius: 4px;
+}
+.grid-content {
+  border-radius: 4px;
+  min-height: 36px;
 }
 </style>
 
